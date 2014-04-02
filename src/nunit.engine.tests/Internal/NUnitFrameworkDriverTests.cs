@@ -196,7 +196,7 @@ namespace NUnit.Engine.Internal.Tests
         public void RunTestsAction_AfterLoad_ReturnsRunnableSuite()
         {
             _driver.Load();
-            var result = XmlHelper.CreateXmlNode(_driver.Run(TestListener.Null, TestFilter.Empty));
+            var result = XmlHelper.CreateXmlNode(_driver.Run(new NullListener(), TestFilter.Empty));
 
             Assert.That(result.Name, Is.EqualTo("test-suite"));
             Assert.That(result.GetAttribute("type"), Is.EqualTo("Assembly"));
@@ -213,7 +213,7 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void RunTestsAction_WithoutLoad_ThrowsInvalidOperationException()
         {
-            var ex = Assert.Catch(() => _driver.Run(TestListener.Null, TestFilter.Empty));
+            var ex = Assert.Catch(() => _driver.Run(new NullListener(), TestFilter.Empty));
             if (ex is System.Reflection.TargetInvocationException)
                 ex = ex.InnerException;
             Assert.That(ex, Is.TypeOf<InvalidOperationException>());
@@ -225,7 +225,7 @@ namespace NUnit.Engine.Internal.Tests
         {
             var driver = new NUnitFrameworkDriver(AppDomain.CurrentDomain, MISSING_FILE, _settings);
             driver.Load();
-            var result = XmlHelper.CreateXmlNode(driver.Run(TestListener.Null, TestFilter.Empty));
+            var result = XmlHelper.CreateXmlNode(driver.Run(new NullListener(), TestFilter.Empty));
 
             Assert.That(result.Name, Is.EqualTo("test-suite"));
             Assert.That(result.GetAttribute("type"), Is.EqualTo("Assembly"));
@@ -240,7 +240,7 @@ namespace NUnit.Engine.Internal.Tests
         {
             var driver = new NUnitFrameworkDriver(AppDomain.CurrentDomain, BAD_FILE, _settings);
             driver.Load();
-            var result = XmlHelper.CreateXmlNode(driver.Run(TestListener.Null, TestFilter.Empty));
+            var result = XmlHelper.CreateXmlNode(driver.Run(new NullListener(), TestFilter.Empty));
 
             Assert.That(result.Name, Is.EqualTo("test-suite"));
             Assert.That(result.GetAttribute("type"), Is.EqualTo("Assembly"));
@@ -272,6 +272,16 @@ namespace NUnit.Engine.Internal.Tests
             public void RaiseCallbackEvent(string eventArgument)
             {
                 _result = eventArgument;
+            }
+        }
+        #endregion
+
+        #region Nested NullListener Class
+        public class NullListener : ITestEventListener
+        {
+            public void OnTestEvent(string testEvent)
+            {
+                // No action
             }
         }
         #endregion
